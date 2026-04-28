@@ -1,0 +1,15 @@
+{
+  "current": "answer_v1",
+  "versions": {
+    "answer_v1": {
+      "file": "answer_v1.txt",
+      "sha256": "eeb11255b1f268764ac8cfc37c85a93d6f33c30bd41537e47f33fa32c752207d",
+      "created": "2024-09-01",
+      "description": "Initial production prompt \u2014 strict grounding, inline [chunk_N] citations, no-answer fallback",
+      "changelog": "Initial version",
+      "eval_report": "C:\\Users\\kshit\\Desktop\\askmydocs\\logs\\eval_20260427_141614.json",
+      "ci_passed": false
+    }
+  },
+  "schema_version": 1
+}

@@ -1,0 +1,296 @@
+name: RAG Pipeline CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  # ── Job 1: Unit tests ────────────────────────────────────────────────
+  # Runs on every push and PR. No API keys needed.
+  unit-tests:
+    name: Unit Tests
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+        cache: pip
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run all unit tests
+      run: pytest tests/ -v --tb=short
+
+    - name: Coverage report
+      run: |
+        pip install pytest-cov
+        pytest tests/ --cov=. --cov-report=term-missing --cov-report=xml --cov-fail-under=55
+      continue-on-error: true
+
+    - name: Upload coverage artifact
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: coverage-report
+        path: coverage.xml
+
+
+  # ── Job 2: Monitoring & metric regression ────────────────────────────
+  # Validates golden dataset, metric functions, CI gate logic,
+  # and MetricsStore schema. No API keys needed.
+  monitoring-checks:
+    name: Monitoring & Metric Checks
+    runs-on: windows-latest
+    needs: unit-tests
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+        cache: pip
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Validate golden dataset schema
+      run: |
+        python -c "
+import json, sys
+from pathlib import Path
+data = json.loads(Path('data/golden_dataset.json').read_text())
+required = {'id','question','expected_answer','expected_keywords','category','difficulty'}
+errors = []
+for i, entry in enumerate(data):
+    missing = required - set(entry.keys())
+    if missing:
+        errors.append(f'Entry {i} ({entry.get(\"id\",\"?\")}) missing: {missing}')
+if errors:
+    [print(e) for e in errors]; sys.exit(1)
+answerable   = [e for e in data if e.get('expected_answer') is not None]
+unanswerable = [e for e in data if e.get('expected_answer') is None]
+print(f'Golden dataset OK: {len(data)} entries ({len(answerable)} answerable, {len(unanswerable)} unanswerable)')
+assert len(unanswerable) >= 2, 'Need at least 2 unanswerable entries'
+assert len(answerable)   >= 5, 'Need at least 5 answerable entries'
+print('Golden dataset structure valid')
+"
+
+    - name: Metric functions smoke test
+      run: |
+        python -c "
+import sys; sys.path.insert(0, '.')
+from evaluation.metrics import compute_all_metrics
+m = compute_all_metrics(
+    question='What is the refund policy?',
+    answer='Refunds are processed within 30 days [chunk_1]. Contact billing@helixdb.io [chunk_1].',
+    expected_keywords=['refund', '30'],
+    expected_answer='30-day',
+    retrieved_chunks=[{'text': 'HelixDB offers a 30-day refund policy for paid plans.', 'source': 'doc.md', 'chunk_index': 0}],
+    approved_chunks= [{'text': 'HelixDB offers a 30-day refund policy for paid plans.', 'source': 'doc.md', 'chunk_index': 0}],
+    latency_ms=800.0,
+)
+assert 0.0 <= m['retrieval_recall']    <= 1.0, f'recall out of range: {m[\"retrieval_recall\"]}'
+assert 0.0 <= m['citation_coverage']  <= 1.0, f'citation out of range: {m[\"citation_coverage\"]}'
+assert 0.0 <= m['faithfulness_score'] <= 1.0, f'faith out of range: {m[\"faithfulness_score\"]}'
+assert m['citation_coverage'] > 0, 'Expected citation coverage > 0 for cited answer'
+print('Metric smoke test passed:', {k: round(v, 3) if isinstance(v, float) else v for k,v in m.items()})
+"
+
+    - name: CI gate threshold sanity
+      run: |
+        python -c "
+from evaluation.ci_gate import CI_THRESHOLDS, check_thresholds
+# Passing values
+passing = {
+    'retrieval_recall': 0.9, 'retrieval_precision': 0.8,
+    'citation_coverage': 0.9, 'faithfulness_score': 0.9,
+    'hallucination_rate': 0.02, 'answer_accuracy': 0.85,
+    'unanswerable_accuracy': 0.95
+}
+passed, failures = check_thresholds(passing)
+assert passed, f'Passing aggregate failed CI: {failures}'
+# Failing values
+failing = {k: 0.1 for k in passing}
+failing['hallucination_rate'] = 0.9
+passed2, _ = check_thresholds(failing)
+assert not passed2, 'Failing aggregate incorrectly passed CI'
+print(f'CI gate sanity OK — {len(CI_THRESHOLDS)} thresholds validated')
+"
+
+    - name: MetricsStore smoke test
+      run: |
+        python -c "
+import sys, tempfile
+from pathlib import Path
+sys.path.insert(0, '.')
+with tempfile.TemporaryDirectory() as tmp:
+    from monitoring.metrics_store import MetricsStore, QueryMetric
+    store = MetricsStore(db_path=Path(tmp) / 'test.db')
+    m = QueryMetric(
+        question='test question',
+        latency_ms=1200.0,
+        retrieval_latency_ms=200.0,
+        reranking_latency_ms=300.0,
+        generation_latency_ms=700.0,
+        input_tokens=500,
+        output_tokens=150,
+        cost_usd=QueryMetric.compute_cost(500, 150),
+        citation_coverage=0.8,
+        faithfulness_score=0.75,
+        was_answered=True,
+        retrieval_count=10,
+        approved_count=4,
+    )
+    store.record(m)
+    store.record(m)
+    summary = store.summary(window_hours=1)
+    assert summary['total_queries'] == 2
+    assert summary['latency_p50_ms'] == 1200.0
+    assert summary['failure_rate'] == 0.0
+    assert summary['cost_total_usd'] > 0
+    print('MetricsStore smoke test passed — P50:', summary['latency_p50_ms'], 'ms, Cost:', summary['cost_total_usd'])
+"
+
+    - name: Token counter smoke test
+      run: |
+        python -c "
+import sys; sys.path.insert(0, '.')
+from monitoring.token_counter import count_tokens, estimate_tokens
+n = count_tokens('Hello, world! This is a test sentence.')
+assert n > 0, 'Token count must be positive'
+inp, out = estimate_tokens('Input prompt text here.', 'Output answer here.')
+assert inp > 0 and out > 0
+print(f'Token counter OK — sample count: {n}, estimate: ({inp}, {out})')
+"
+
+    - name: Prompt versioner smoke test
+      run: |
+        python -c "
+import sys; sys.path.insert(0, '.')
+from monitoring.prompt_versioner import PromptVersioner
+pv = PromptVersioner()
+pv.ensure_hashes_populated()
+status = pv.status()
+print('Prompt versioner OK:', status['current_version'], '— integrity:', status['integrity_ok'])
+# After backfill, integrity should be True or None (not False)
+assert status['integrity_ok'] is not False, f'Integrity check failed: {status}'
+"
+
+
+  # ── Job 3: Prompt integrity check ───────────────────────────────────
+  # Confirms no prompt was silently modified without a version bump.
+  prompt-integrity:
+    name: Prompt Integrity
+    runs-on: windows-latest
+    needs: unit-tests
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+        cache: pip
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Check prompt integrity
+      run: |
+        python -c "
+import sys; sys.path.insert(0, '.')
+from monitoring.prompt_versioner import PromptVersioner
+pv = PromptVersioner()
+pv.ensure_hashes_populated()
+try:
+    pv.check_for_changes()
+    print('Prompt integrity OK — no unregistered changes detected')
+except RuntimeError as e:
+    print(str(e))
+    sys.exit(1)
+"
+
+    - name: Validate prompt version manifest schema
+      run: |
+        python -c "
+import json, sys
+from pathlib import Path
+manifest = json.loads(Path('prompts/versions.json').read_text())
+assert 'current'        in manifest, 'Missing: current'
+assert 'versions'       in manifest, 'Missing: versions'
+assert 'schema_version' in manifest, 'Missing: schema_version'
+current = manifest['current']
+assert current in manifest['versions'], f'Current version {current!r} not in versions dict'
+print(f'Prompt manifest valid — current: {current}, versions: {list(manifest[\"versions\"].keys())}')
+"
+
+
+  # ── Job 4: Evaluation gate (main branch only) ────────────────────────
+  # Checks the most recently committed eval report against CI thresholds.
+  # Requires a report to be committed to logs/ before activating.
+  eval-gate:
+    name: Evaluation Gate
+    runs-on: windows-latest
+    needs: [ unit-tests, monitoring-checks, prompt-integrity ]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+        cache: pip
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run evaluation gate
+      shell: bash
+      run: |
+        REPORT=$(ls logs/eval_*.json 2>/dev/null | sort -r | head -1)
+        if [ -n "$REPORT" ]; then
+          echo "Running CI gate on: $REPORT"
+          python -m evaluation.ci_gate "$REPORT"
+        else
+          echo "No eval report committed yet — gate skipped."
+          echo ""
+          echo "To activate the gate:"
+          echo "  1. python cli.py eval --ci"
+          echo "  2. git add logs/eval_*.json prompts/versions.json"
+          echo "  3. git commit -m 'eval: initial evaluation report'"
+          echo "  4. git push"
+        fi
+
+    - name: Verify prompt version has CI result
+      shell: bash
+      run: |
+        python -c "
+import json, sys
+from pathlib import Path
+manifest = json.loads(Path('prompts/versions.json').read_text())
+current = manifest['current']
+entry = manifest['versions'].get(current, {})
+ci_passed = entry.get('ci_passed')
+if ci_passed is None:
+    print(f'Prompt version {current!r} has no CI result yet — skipping check')
+    print('Run: python cli.py eval --ci to record a result')
+elif ci_passed is True:
+    print(f'Prompt version {current!r}: CI passed')
+else:
+    print(f'ERROR: Prompt version {current!r}: last CI run FAILED')
+    print('Run eval again or investigate the regression')
+    sys.exit(1)
+"

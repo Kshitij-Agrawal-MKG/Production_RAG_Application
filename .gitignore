@@ -1,0 +1,44 @@
+# Environment
+.env
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Indexes (local data — don't commit)
+data/indexes/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+# Monitoring metrics database (binary, do not commit)
+logs/metrics.db
+
+# Keep these tracked (commit them intentionally):
+# logs/queries.jsonl        — query audit log
+# logs/eval_*.json          — evaluation reports for CI gate

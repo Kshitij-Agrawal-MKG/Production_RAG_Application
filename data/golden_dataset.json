@@ -1,0 +1,292 @@
+[
+  {
+    "id": "gd_001",
+    "question": "What is the refund policy for HelixDB paid plans?",
+    "expected_answer": "30-day money-back guarantee",
+    "expected_keywords": ["refund", "30", "money-back", "billing"],
+    "source_hint": "03_data_integrations_support.md",
+    "category": "factual",
+    "difficulty": "easy",
+    "notes": "Answer is explicitly in 03: '30-day money-back guarantee for first-time subscribers'"
+  },
+  {
+    "id": "gd_002",
+    "question": "How does API key authentication work in HelixDB?",
+    "expected_answer": "Bearer token in Authorization header",
+    "expected_keywords": ["api", "key", "authorization", "bearer", "header"],
+    "source_hint": "02_authentication_security_api.md",
+    "category": "technical",
+    "difficulty": "medium",
+    "notes": "Answer is in 02: Authorization header with Bearer prefix"
+  },
+  {
+    "id": "gd_003",
+    "question": "What are the minimum system requirements for the HelixDB Community Edition?",
+    "expected_answer": "4 cores, 8 GB RAM, SSD",
+    "expected_keywords": ["cpu", "ram", "disk", "ssd", "cores", "community"],
+    "source_hint": "01_overview_and_pricing.md",
+    "category": "factual",
+    "difficulty": "easy",
+    "notes": "Answer is in 01 under System Requirements — Community Edition section"
+  },
+  {
+    "id": "gd_004",
+    "question": "How do I reset my HelixDB account password?",
+    "expected_answer": "forgot-password page, email link valid for 1 hour",
+    "expected_keywords": ["password", "reset", "email", "forgot", "link"],
+    "source_hint": "02_authentication_security_api.md",
+    "category": "procedural",
+    "difficulty": "easy",
+    "notes": "Step-by-step reset procedure is in 02: forgot-password URL and 1-hour link"
+  },
+  {
+    "id": "gd_005",
+    "question": "How much does the HelixDB Growth Plan cost and what does it include?",
+    "expected_answer": "$199 per month, 50 million data points, 1-year retention",
+    "expected_keywords": ["growth", "199", "million", "retention", "plan"],
+    "source_hint": "01_overview_and_pricing.md",
+    "category": "factual",
+    "difficulty": "easy",
+    "notes": "Pricing table is in 01: Growth Plan is $199/month"
+  },
+  {
+    "id": "gd_006",
+    "question": "How do I deploy HelixDB using Docker?",
+    "expected_answer": "docker pull helixdb/community:latest",
+    "expected_keywords": ["docker", "pull", "helixdb", "community", "container"],
+    "source_hint": "01_overview_and_pricing.md",
+    "category": "procedural",
+    "difficulty": "easy",
+    "notes": "Docker deployment command is in 01 under System Requirements"
+  },
+  {
+    "id": "gd_007",
+    "question": "What data ingestion formats does HelixDB support?",
+    "expected_answer": "Line Protocol, JSON, CSV, Kafka, OpenTelemetry OTLP",
+    "expected_keywords": ["csv", "json", "kafka", "line protocol", "otlp", "opentelemetry"],
+    "source_hint": "01_overview_and_pricing.md",
+    "category": "technical",
+    "difficulty": "medium",
+    "notes": "All 5 ingestion formats are listed in 01 under Supported Data Formats"
+  },
+  {
+    "id": "gd_008",
+    "question": "What are the API rate limits for the HelixDB Growth Plan?",
+    "expected_answer": "1000 write requests per second, 3000 query requests per minute",
+    "expected_keywords": ["rate", "limit", "1000", "3000", "growth", "request"],
+    "source_hint": "02_authentication_security_api.md",
+    "category": "technical",
+    "difficulty": "medium",
+    "notes": "Rate limits table is in 02: Growth is 1000 write/sec, 3000 query/min"
+  },
+  {
+    "id": "gd_009",
+    "question": "How do I contact HelixDB customer support?",
+    "expected_answer": "email support@helixdb.io",
+    "expected_keywords": ["support", "email", "contact", "helixdb.io"],
+    "source_hint": "03_data_integrations_support.md",
+    "category": "factual",
+    "difficulty": "easy",
+    "notes": "Support contacts are in 03: email is support@helixdb.io"
+  },
+  {
+    "id": "gd_010",
+    "question": "What encryption does HelixDB use to protect data at rest?",
+    "expected_answer": "AES-256-GCM with AWS KMS or GCP Cloud KMS",
+    "expected_keywords": ["aes", "256", "encrypt", "kms", "rest"],
+    "source_hint": "02_authentication_security_api.md",
+    "category": "technical",
+    "difficulty": "medium",
+    "notes": "Encryption at rest section is in 02: AES-256-GCM, KMS key management"
+  },
+  {
+    "id": "gd_011",
+    "question": "What export formats does HelixDB support and how do I export data?",
+    "expected_answer": "CSV, JSON, Parquet, Arrow — via dashboard or REST API",
+    "expected_keywords": ["export", "csv", "parquet", "arrow", "download"],
+    "source_hint": "03_data_integrations_support.md",
+    "category": "procedural",
+    "difficulty": "medium",
+    "notes": "Export formats and steps are in 03 under Data Export section"
+  },
+  {
+    "id": "gd_012",
+    "question": "What is the maximum CSV file size allowed for bulk import in HelixDB?",
+    "expected_answer": "500 MB",
+    "expected_keywords": ["csv", "500", "mb", "upload", "import", "limit"],
+    "source_hint": "03_data_integrations_support.md",
+    "category": "factual",
+    "difficulty": "easy",
+    "notes": "Explicitly stated in 03 under File Upload Limits: 500 MB for CSV bulk import"
+  },
+  {
+    "id": "gd_013",
+    "question": "What user roles and permissions are available in HelixDB?",
+    "expected_answer": "Owner, Admin, Editor, Viewer — plus custom roles on Enterprise",
+    "expected_keywords": ["owner", "admin", "editor", "viewer", "role", "permission"],
+    "source_hint": "02_authentication_security_api.md",
+    "category": "technical",
+    "difficulty": "medium",
+    "notes": "All four roles plus custom roles are described in 02 under User Roles"
+  },
+  {
+    "id": "gd_014",
+    "question": "What happens to my HelixDB account if my payment fails?",
+    "expected_answer": "Retried after 3 and 7 days, then downgraded to Free Tier after three failures",
+    "expected_keywords": ["payment", "fail", "retry", "downgrade", "free tier"],
+    "source_hint": "03_data_integrations_support.md",
+    "category": "procedural",
+    "difficulty": "medium",
+    "notes": "Payment failure flow is in 03: 3-day retry, 7-day retry, then Free Tier downgrade"
+  },
+  {
+    "id": "gd_015",
+    "question": "Does HelixDB offer a free trial for paid plans?",
+    "expected_answer": "Yes, 14-day free trial with full feature access, no credit card required",
+    "expected_keywords": ["trial", "14", "free", "credit card", "day"],
+    "source_hint": "01_overview_and_pricing.md",
+    "category": "factual",
+    "difficulty": "easy",
+    "notes": "Free trial details are in 01 pricing section: 14-day trial, no credit card"
+  },
+  {
+    "id": "gd_016",
+    "question": "How does HelixDB integrate with Grafana?",
+    "expected_answer": "Official data source plugin available in the Grafana plugin catalogue",
+    "expected_keywords": ["grafana", "plugin", "data source", "catalogue"],
+    "source_hint": "03_data_integrations_support.md",
+    "category": "technical",
+    "difficulty": "medium",
+    "notes": "Grafana integration is in 03 under Monitoring and Alerting integrations"
+  },
+  {
+    "id": "gd_017",
+    "question": "What is the data retention period for the HelixDB Starter Plan?",
+    "expected_answer": "90 days",
+    "expected_keywords": ["retention", "90", "days", "starter"],
+    "source_hint": "03_data_integrations_support.md",
+    "category": "factual",
+    "difficulty": "easy",
+    "notes": "Retention policy table is in 03: Starter plan has 90-day retention"
+  },
+  {
+    "id": "gd_018",
+    "question": "How do I cancel my HelixDB subscription?",
+    "expected_answer": "Settings → Billing → Cancel Plan, takes effect at end of billing period",
+    "expected_keywords": ["cancel", "billing", "settings", "subscription", "period"],
+    "source_hint": "03_data_integrations_support.md",
+    "category": "procedural",
+    "difficulty": "easy",
+    "notes": "Cancellation steps are in 03 under Cancellation and Refunds"
+  },
+  {
+    "id": "gd_019",
+    "question": "Which programming languages does HelixDB provide official SDKs for?",
+    "expected_answer": "Python, JavaScript, Go, Java, Rust",
+    "expected_keywords": ["python", "javascript", "go", "java", "rust", "sdk"],
+    "source_hint": "03_data_integrations_support.md",
+    "category": "technical",
+    "difficulty": "easy",
+    "notes": "SDK list is in 03 under SDK and Programming Language Support: 5 official SDKs"
+  },
+  {
+    "id": "gd_020",
+    "question": "What uptime SLA does HelixDB guarantee for the Growth Plan?",
+    "expected_answer": "99.9% monthly uptime",
+    "expected_keywords": ["uptime", "99.9", "sla", "growth", "guarantee"],
+    "source_hint": "03_data_integrations_support.md",
+    "category": "factual",
+    "difficulty": "easy",
+    "notes": "SLA table is in 03: Growth plan has 99.9% uptime guarantee"
+  },
+  {
+    "id": "gd_021",
+    "question": "What compliance certifications does HelixDB hold?",
+    "expected_answer": "SOC 2 Type II, ISO 27001, HIPAA BAA, GDPR",
+    "expected_keywords": ["soc 2", "iso 27001", "hipaa", "gdpr", "compliance"],
+    "source_hint": "02_authentication_security_api.md",
+    "category": "factual",
+    "difficulty": "medium",
+    "notes": "Compliance certifications are listed in 02 under Security Architecture"
+  },
+  {
+    "id": "gd_022",
+    "question": "How do I configure multi-factor authentication in HelixDB?",
+    "expected_answer": "Available for all paid plans; supports TOTP apps, hardware keys, backup codes",
+    "expected_keywords": ["mfa", "totp", "authenticator", "two-factor", "factor"],
+    "source_hint": "02_authentication_security_api.md",
+    "category": "procedural",
+    "difficulty": "medium",
+    "notes": "MFA section in 02 covers TOTP, WebAuthn/FIDO2, and backup codes"
+  },
+  {
+    "id": "gd_023",
+    "question": "What query language does HelixDB use and what are its key operators?",
+    "expected_answer": "HelixQL — DOWNSAMPLE, FILL, ANOMALY, ALIGN BY",
+    "expected_keywords": ["helixql", "downsample", "fill", "anomaly", "query"],
+    "source_hint": "01_overview_and_pricing.md",
+    "category": "technical",
+    "difficulty": "medium",
+    "notes": "HelixQL is described in 01 under Core Features with all four operators"
+  },
+  {
+    "id": "gd_024",
+    "question": "How often does HelixDB rotate encryption keys?",
+    "expected_answer": "Automatically every 90 days",
+    "expected_keywords": ["key", "rotation", "90", "days", "kms"],
+    "source_hint": "02_authentication_security_api.md",
+    "category": "factual",
+    "difficulty": "hard",
+    "notes": "Key rotation period is in 02: automatic rotation every 90 days via KMS"
+  },
+  {
+    "id": "gd_025",
+    "question": "What Kafka version is required for the HelixDB Kafka connector?",
+    "expected_answer": "Confluent Platform 6.0+ or Apache Kafka 2.8+",
+    "expected_keywords": ["kafka", "confluent", "2.8", "connector", "version"],
+    "source_hint": "01_overview_and_pricing.md",
+    "category": "technical",
+    "difficulty": "hard",
+    "notes": "Kafka compatibility requirements are in 01 under Apache Kafka Integration"
+  },
+  {
+    "id": "gd_unanswerable_001",
+    "question": "What is the stock price of HelixDB?",
+    "expected_answer": null,
+    "expected_keywords": [],
+    "source_hint": null,
+    "category": "unanswerable",
+    "difficulty": "easy",
+    "notes": "Financial market data — not in any KB document"
+  },
+  {
+    "id": "gd_unanswerable_002",
+    "question": "Who is the CEO of HelixDB?",
+    "expected_answer": null,
+    "expected_keywords": [],
+    "source_hint": null,
+    "category": "unanswerable",
+    "difficulty": "easy",
+    "notes": "Org chart / personnel data — not in KB documents"
+  },
+  {
+    "id": "gd_unanswerable_003",
+    "question": "What is HelixDB's office address in San Francisco?",
+    "expected_answer": null,
+    "expected_keywords": [],
+    "source_hint": null,
+    "category": "unanswerable",
+    "difficulty": "easy",
+    "notes": "Physical office location — not mentioned anywhere in the KB"
+  },
+  {
+    "id": "gd_unanswerable_004",
+    "question": "What is the weather forecast for London tomorrow?",
+    "expected_answer": null,
+    "expected_keywords": [],
+    "source_hint": null,
+    "category": "unanswerable",
+    "difficulty": "easy",
+    "notes": "Completely off-domain — tests citation guard hard rejection"
+  }
+]

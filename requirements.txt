@@ -1,0 +1,26 @@
+# ── Document parsing ──────────────────────────────────────────────────
+PyMuPDF==1.24.1              # PDF parsing (fitz)
+python-docx==1.1.0           # DOCX parsing
+beautifulsoup4==4.12.3       # HTML/MD parsing
+lxml==5.2.1                  # HTML parser backend for bs4
+markdown==3.6                # Markdown → HTML conversion
+
+# ── Embeddings & Vector Store ─────────────────────────────────────────
+sentence-transformers==3.0.1 # Bi-encoder + cross-encoder models
+chromadb==1.5.8               # Local vector store (no server needed)
+
+# ── BM25 ──────────────────────────────────────────────────────────────
+rank_bm25==0.2.2             # Pure-Python BM25, no OpenSearch needed
+
+# ── LLM (Gemini) ──────────────────────────────────────────────────────
+google-generativeai==0.7.2   # Gemini free-tier API
+
+# ── Monitoring & Observability ────────────────────────────────────────
+langfuse==2.36.1             # Distributed tracing (optional — degrades to no-op)
+
+# ── Utilities ─────────────────────────────────────────────────────────
+python-dotenv==1.0.1         # Load .env for API keys
+rich==13.7.1                 # Beautiful CLI output
+tiktoken==0.7.0              # Token counting for cost tracking and chunking
+numpy==1.26.4                # Array ops for RRF scoring
+tqdm==4.66.4                 # Progress bars during ingestion
